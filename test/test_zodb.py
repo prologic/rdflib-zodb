@@ -524,3 +524,13 @@ class ZODBContextTestCase(context_case.ContextTestCase):
         asserte(len(list(c1triples((Any, Any, Any)))), 0)
         asserte(len(list(triples((Any, Any, Any)))), 0)
 
+
+def load_tests(loader, tests, pattern):
+    from unittest import TestSuite, TestLoader
+    if not ZODB:
+        from unittest import SkipTest
+        raise SkipTest("ZODB not installed")
+    suite = TestSuite()
+    suite.addTests(TestLoader().loadTestsFromTestCase(ZODBGraphTestCase))
+    suite.addTests(TestLoader().loadTestsFromTestCase(ZODBContextTestCase))
+    return suite

@@ -5,17 +5,15 @@ branches:
   only:
     - master
 
-#python:
-#    - 2.6
-#    - 2.7
-#    - 3.2
-#    - 3.3
+python:
+    - 2.7
+
+env:
+    - REQUIREMENTS=requirements.py2.txt
 
 matrix:
     include:
         - python: 2.6 
-          env: REQUIREMENTS=requirements.py2.txt
-        - python: 2.7
           env: REQUIREMENTS=requirements.py2.txt
         - python: 3.2
           env: REQUIREMENTS=requirements.py3.txt

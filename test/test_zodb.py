@@ -1,15 +1,14 @@
 try:
     import ZODB
+    import transaction
 except ImportError:
-    from nose.exc import SkipTest
-    raise SkipTest("ZODB not installed")
+    ZODB = False
 
 import logging
 
 _logger = logging.getLogger(__name__)
 
 import os
-import transaction
 from rdflib import RDF, URIRef, BNode, ConjunctiveGraph, Graph
 import graph_case
 import context_case
@@ -35,12 +34,11 @@ class ZODBGraphTestCase(graph_case.GraphTestCase):
             from ZEO.ClientStorage import ClientStorage 
             schema, opts = _parse_rfc1738_args(self.url) 
             fs = ClientStorage((opts['host'], int(opts['port']))) 
-        zdb=ZODB.DB(fs) 
-        conn=zdb.open() 
-        root=conn.root() 
+        self.zdb=ZODB.DB(fs) 
+        self.conn=self.zdb.open() 
+        root=self.conn.root() 
         if 'rdflib' not in root: 
             root['rdflib'] = ConjunctiveGraph(self.store_name)
-        root['rdflib'].zdb = zdb
         self.graph = self.g = root['rdflib']
         
         self.michel = URIRef(u'michel')
@@ -54,6 +52,9 @@ class ZODBGraphTestCase(graph_case.GraphTestCase):
     
     def tearDown(self):
         self.graph.close()
+        transaction.commit()
+        self.conn.close()
+        self.zdb.close()
         os.unlink('/tmp/zodb_local2.fs')
         os.unlink('/tmp/zodb_local2.fs.index')
         os.unlink('/tmp/zodb_local2.fs.tmp')
@@ -185,7 +186,6 @@ class ZODBGraphTestCase(graph_case.GraphTestCase):
         g2.add((bob, RDF.value, pizza))
         g2.add((bob, RDF.value, cheese))
         g2.add((alice, RDF.value, pizza))
-        
         gv1 = GraphValue(store=graph.store, graph=g1)
         gv2 = GraphValue(store=graph.store, graph=g2)
         graph.add((gv1, RDF.value, gv2))
@@ -218,12 +218,11 @@ class ZODBContextTestCase(context_case.ContextTestCase):
             from ZEO.ClientStorage import ClientStorage 
             schema, opts = _parse_rfc1738_args(self.url) 
             fs=ClientStorage((opts['host'],int(opts['port']))) 
-        zdb=ZODB.DB(fs) 
-        conn=zdb.open() 
-        root=conn.root() 
+        self.zdb=ZODB.DB(fs) 
+        self.conn=self.zdb.open() 
+        root=self.conn.root() 
         if 'rdflib' not in root: 
             root['rdflib'] = ConjunctiveGraph(self.store_name)
-        root['rdflib'].zdb = zdb
         self.graph = self.g = root['rdflib']
         
         self.michel = URIRef(u'michel')
@@ -237,6 +236,9 @@ class ZODBContextTestCase(context_case.ContextTestCase):
     
     def tearDown(self):
         self.graph.close()
+        transaction.commit()
+        self.conn.close()
+        self.zdb.close()
         os.unlink('/tmp/zodb_local3.fs')
         os.unlink('/tmp/zodb_local3.fs.index')
         os.unlink('/tmp/zodb_local3.fs.tmp')

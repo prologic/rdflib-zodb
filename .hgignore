@@ -1,0 +1,12 @@
+syntax: glob
+
+.git
+.coverage
+.tox
+coverage.xml
+dist/
+htmlcov/
+*,cover
+dist
+build
+*egg-info

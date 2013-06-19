@@ -1,0 +1,9 @@
+[run]
+omit = .tox*
+       test*
+
+[html]
+directory = coverage
+
+[xml]
+output = coverage.xml

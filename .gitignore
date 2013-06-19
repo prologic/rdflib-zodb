@@ -1,5 +1,7 @@
+*.pyc
 .coverage
 .tox
+converage
 coverage.xml
 dist/
 htmlcov/

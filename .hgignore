@@ -1,8 +1,10 @@
 syntax: glob
 
 .git
+*.pyc
 .coverage
 .tox
+coverage
 coverage.xml
 dist/
 htmlcov/
